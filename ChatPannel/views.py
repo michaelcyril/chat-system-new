@@ -162,7 +162,7 @@ def UserGetMessageView(request,from_, to_):
                     # 'to': data.group.id,
                     'file': data.file.name,
                     'message': data.message,
-                    # 'file': data.file
+                    'created_at': data.created_at
                 }
             else:
                 d = {
@@ -171,7 +171,7 @@ def UserGetMessageView(request,from_, to_):
                     # 'to': data.group.id,
                     # 'file': data.file,
                     'message': data.message,
-                    # 'file': data.file
+                    'created_at': data.created_at
                 }
             m.append(d)
 
@@ -185,7 +185,7 @@ def UserGetMessageView(request,from_, to_):
                     # 'to': data.group.id,
                     'file': data.file.name,
                     'message': data.message,
-                    # 'file': data.file
+                    'created_at': data.created_at
                 }
             else:
                 d = {
@@ -194,7 +194,7 @@ def UserGetMessageView(request,from_, to_):
                     # 'to': data.group.id,
                     # 'file': data.file,
                     'message': data.message,
-                    # 'file': data.file
+                    'created_at': data.created_at
                 }
             m.append(d)
 
@@ -217,7 +217,7 @@ def GroupGetMessageView(request,grp):
                 # 'to': data.group.id,
                 'file': data.file.name,
                 'message': data.message,
-                # 'file': data.file
+                'created_at': data.created_at
             }
         else:
             d = {
@@ -226,18 +226,10 @@ def GroupGetMessageView(request,grp):
                 # 'to': data.group.id,
                 # 'file': data.file,
                 'message': data.message,
-                # 'file': data.file
+                'created_at': data.created_at
             }
         m.append(d)
-        # d = {
-        #     'from_user': data.from_user.username,
-        #     'from_user_id': data.from_user.id,
-        #     'group': data.group.id,
-        #     'message': data.message,
-        #     # 'file': data.file
-        # }
-        m.append(d)
-
+    print(m)
     # list = [entry for entry in message]
     return Response(m)
 
@@ -248,3 +240,29 @@ def GroupGetView(request):
     groups = Groups.objects.values('id', 'created_by', 'group_name', 'description', 'created_at').filter(is_deleted=False)
 
     return Response(groups)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def FilesView(request):
+    groups = Messages.objects.all()
+    files = []
+    if len(groups)>0:
+        for data in groups:
+            if data.file:
+                print('here')
+                file_size = data.file.size
+
+                # Get the human-readable size
+                if file_size < 1024:
+                    size_text = f"{file_size} B"
+                elif file_size < 1024 ** 2:
+                    size_text = f"{file_size / 1024:.2f} KB"
+                elif file_size < 1024 ** 3:
+                    size_text = f"{file_size / (1024 ** 2):.2f} MB"
+                else:
+                    size_text = f"{file_size / (1024 ** 3):.2f} GB"
+                files.append({'name': data.file.name, 'storage': size_text})
+            else:
+                pass
+
+    return Response(files)

@@ -8,5 +8,6 @@ urlpatterns = [
     path('usermessages/<int:from_>/<int:to_>',UserGetMessageView),
     path('groupmessages/<int:grp>',GroupGetMessageView),
     path('all-groups', GroupGetView),
+    path('all-files', FilesView),
 
 ]
